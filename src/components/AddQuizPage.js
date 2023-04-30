@@ -1,19 +1,34 @@
 import React, { useState } from 'react';
-import { TextField, Button, Typography, FormControl, InputLabel, Select, MenuItem, Box } from '@mui/material';
+import {
+  TextField,
+  Button,
+  Typography,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  Box,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions
+} from '@mui/material';
 import { styled } from '@mui/system';
 import coverImage from '../resources/quizzercover.jpg';
 import Sidebar from '../common/SideBar';
 import { db } from "../Utility/firebase";
 import {
-    collection,
-    getDocs,
-    addDoc,
-    updateDoc,
-    deleteDoc,
-    doc,
-    query,
-    where
-  } from "firebase/firestore";
+  collection,
+  getDocs,
+  addDoc,
+  updateDoc,
+  deleteDoc,
+  doc,
+  query,
+  where
+} from "firebase/firestore";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const quizzesCollectionRef = collection(db, "Quizzes");
 
@@ -50,6 +65,17 @@ export default function ModerateForm() {
     category: ''
   });
 
+  const [openPrompt, setOpenPrompt] = useState(false);
+  
+  const [promptValues, setPromptValues] = useState({
+    input1: '',
+    input2: '',
+    input3: '',
+    input4: '',
+    input5: '',
+    input6: ''
+  });
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setValues((prevValues) => ({
@@ -58,130 +84,176 @@ export default function ModerateForm() {
     }));
   };
 
+  const handlePromptChange = (e) => {
+    const { name, value } = e.target;
+    setPromptValues((prevValues) => ({
+      ...prevValues,
+      [name]: value
+    }));
+  };
+
   const handleSubmit = async (e) => {
-    await addDoc(quizzesCollectionRef, { quizname: values.name});
+    handleOpenPrompt();
+  };
+
+  const handleOpenPrompt = () => {
+    setOpenPrompt(true);
+  };
+
+  const handleClosePrompt = () => {
+    setOpenPrompt(false);
+  };
+
+  const handleAddPrompt = () => {
+    if (
+      promptValues.input2 !== promptValues.input3 &&
+      promptValues.input2 !== promptValues.input4 &&
+      promptValues.input2 !== promptValues.input5 &&
+      promptValues.input2 !== promptValues.input6
+    ) {
+      // Error toast message
+      toast.error('Error', {
+        position: 'top-center',
+        autoClose: 1000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: false,
+        progress: undefined,
+      });
+    } else {
+      // Success toast message
+      toast.success('Success', {
+        position: 'top-center',
+        autoClose: 1000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: false,
+        progress: undefined,
+      });
+    }
+    
+    setPromptValues({
+      input1: '',
+      input2: '',
+      input3: '',
+      input4: '',
+      input5: '',
+      input6: ''
+    });
+  };
+
+  const handleDonePrompt = () => {
+    // Perform any necessary action when the "Done" button is clicked in the prompt modal
+    // Example: Close the prompt modal and proceed with form submission
+
+    handleClosePrompt();
     console.log(values);
   };
 
-  return (
+    return (
     <PageContainer>
-    <Sidebar/>
+      <Sidebar  title = "Add Quiz"/>
       <Box paddingTop="2rem">
         <FormContainer>
           <Typography variant="h4" component="h2" align="center">
-            Add Quiz
+            Insert Quiz Details Below
           </Typography>
           <StyledTextField
-            name="name"
-            label="Name"
-            value={values.name}
-            onChange={handleChange}
-          />
-          <StyledTextField
-            name="email"
-            label="Email"
-            value={values.email}
-            onChange={handleChange}
-          />
-          <StyledTextField
-            name="message"
-            label="Message"
-            value={values.message}
-            onChange={handleChange}
-            multiline
-            rows={4}
-          />
-          <FormControl>
-            <InputLabel>Select Category</InputLabel>
-            <Select
-              name="category"
-              value={values.category}
-              onChange={handleChange}
-            >
-              <MenuItem value="programming_in_c">Programming in C</MenuItem>
-              <MenuItem value="mathematics_for_computing">Mathematics for Computing</MenuItem>
-              <MenuItem value="java">Java</MenuItem>
-            </Select>
-          </FormControl>
-          <SubmitButton type="submit" variant="contained" color="primary" onClick={handleSubmit}>
-            Submit
-          </SubmitButton>
-        </FormContainer>
-      </Box>
-    </PageContainer>
-  );
-}
+  name="name"
+  label="Name"
+  value={values.name}
+  onChange={handleChange}
+/>
+<StyledTextField
+  name="email"
+  label="Email"
+  value={values.email}
+  onChange={handleChange}
+/>
+<StyledTextField
+  name="message"
+  label="Message"
+  value={values.message}
+  onChange={handleChange}
+  multiline
+  rows={4}
+/>
+<FormControl>
+  <InputLabel>Select Category</InputLabel>
+  <Select
+    name="category"
+    value={values.category}
+    onChange={handleChange}
+  >
+    <MenuItem value="programming_in_c">Programming in C</MenuItem>
+    <MenuItem value="mathematics_for_computing">Mathematics for Computing</MenuItem>
+    <MenuItem value="java">Java</MenuItem>
+  </Select>
+</FormControl>
+<SubmitButton
+  type="submit"
+  variant="contained"
+  color="primary"
+  onClick={handleSubmit}
+>
+  Submit
+</SubmitButton>
+<Dialog open={openPrompt} onClose={handleClosePrompt}>
+  <DialogTitle>Add Questions</DialogTitle>
+  <DialogContent>
+    <StyledTextField
+      name="input1"
+      label="Input 1"
+      value={promptValues.input1}
+      onChange={handlePromptChange}
+      style={{ margin: '0.5rem 0' }}
+    />
+    <StyledTextField
+      name="input2"
+      label="Input 2"
+      value={promptValues.input2}
+      onChange={handlePromptChange}
+      style={{ margin: '0.5rem 0' }}
+    />
+    <StyledTextField
+      name="input3"
+      label="Input 3"
+      value={promptValues.input3}
+      onChange={handlePromptChange}
+      style={{ margin: '0.5rem 0' }}
+    />
+    <StyledTextField
+      name="input4"
+      label="Input 4"
+      value={promptValues.input4}
+      onChange={handlePromptChange}
+      style={{ margin: '0.5rem 0' }}
+    />
+    <StyledTextField
+      name="input5"
+      label="Input 5"
+      value={promptValues.input5}
+      onChange={handlePromptChange}
+      style={{ margin: '0.5rem 0' }}
+    />
+    <StyledTextField
+      name="input6"
+      label="Input 6"
+      value={promptValues.input6}
+      onChange={handlePromptChange}
+      style={{ margin: '0.5rem 0' }}
+    />
+  </DialogContent>
+  <DialogActions>
+    <Button onClick={handleAddPrompt}>Add</Button>
+    <Button onClick={handleDonePrompt}>Done</Button>
+  </DialogActions>
+</Dialog>
 
-// import React, { useState } from 'react';
-// import { Button, Table, TableBody, TableCell, TableHead, TableRow, TextField, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
-// import DeleteIcon from '@mui/icons-material/Delete';
-
-// const SearchPage = () => {
-//   const [searchText, setSearchText] = useState('');
-//   const [searchResults, setSearchResults] = useState([]);
-//   const [selectedOption, setSelectedOption] = useState('');
-
-//   const handleSearchClick = () => {
-//     // TODO: Implement search logic with Firebase
-//     // Update searchResults state with the retrieved documents
-//   };
-
-//   const handleDeleteClick = (documentId) => {
-//     // TODO: Implement delete logic with Firebase
-//     // Remove the document with the provided documentId from the database
-//   };
-
-//   return (
-//     <div>
-//       {/* Dropdown component */}
-//       <FormControl>
-//         <InputLabel>Select an option</InputLabel>
-//         <Select
-//           value={selectedOption}
-//           onChange={(e) => setSelectedOption(e.target.value)}
-//         >
-//           <MenuItem value="option1">Option 1</MenuItem>
-//           <MenuItem value="option2">Option 2</MenuItem>
-//           <MenuItem value="option3">Option 3</MenuItem>
-//         </Select>
-//       </FormControl>
-
-//       {/* Search button */}
-//       <Button variant="contained" color="primary" onClick={handleSearchClick}>
-//         Search
-//       </Button>
-
-//       {/* Table */}
-//       <Table>
-//         <TableHead>
-//           <TableRow>
-//             <TableCell>Document Name</TableCell>
-//             <TableCell>Actions</TableCell>
-//           </TableRow>
-//         </TableHead>
-//         <TableBody>
-//           {/* Render searchResults data */}
-//           {searchResults.map((document) => (
-//             <TableRow key={document.id}>
-//               <TableCell>{document.name}</TableCell>
-//               <TableCell>
-//                 {/* Delete button */}
-//                 <Button
-//                   variant="contained"
-//                   color="secondary"
-//                   onClick={() => handleDeleteClick(document.id)}
-//                   startIcon={<DeleteIcon />}
-//                 >
-//                   Delete
-//                 </Button>
-//               </TableCell>
-//             </TableRow>
-//           ))}
-//         </TableBody>
-//       </Table>
-//     </div>
-//   );
-// };
-
-// export default SearchPage;
-
+</FormContainer>
+</Box>
+</PageContainer>
+);
+    }
