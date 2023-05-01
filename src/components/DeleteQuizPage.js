@@ -1,5 +1,6 @@
 import React from "react";
 import { useEffect, useState } from "react";
+import { Modal } from "@mui/material";
 import Paper from "@mui/material/Paper";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -37,6 +38,10 @@ export default function UsersList() {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [rows, setRows] = useState([]);
   const empCollectionRef = collection(db, "users");
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [editUser, setEditUser] = useState(null);
+  const [editName, setEditName] = useState("");
+  const [editUid, setEditUid] = useState("");
 
   useEffect(() => {
     getUsers();
@@ -55,6 +60,38 @@ export default function UsersList() {
     setRowsPerPage(+event.target.value);
     setPage(0);
   };
+
+  const filterData = (v) => {
+    if (v) {
+      setRows([v]);
+    } else {
+      getUsers();
+    }
+  };
+
+  const openEditModal = (user) => {
+    setEditModalOpen(true);
+    setEditUser(user);
+    setEditName(user.name);
+    setEditUid(user.uid);
+  };
+
+  const closeEditModal = () => {
+    setEditModalOpen(false);
+    setEditUser(null);
+    setEditName("");
+    setEditUid("");
+  };
+
+  const updateUserData = async () => {
+  if (editUser) {
+    const userDoc = doc(db, "users", editUser.id);
+    await updateDoc(userDoc, { name: editName, uid: editUid });
+    Swal.fire("Updated!", "User data has been updated.", "success");
+    closeEditModal();
+    getUsers();
+  }
+};
 
   const deleteUser = (id) => {
     Swal.fire({
@@ -77,14 +114,6 @@ export default function UsersList() {
     await deleteDoc(userDoc);
     Swal.fire("Deleted!", "Your file has been deleted.", "success");
     getUsers();
-  };
-
-  const filterData = (v) => {
-    if (v) {
-      setRows([v]);
-    } else {
-      getUsers();
-    }
   };
 
   return (
@@ -162,15 +191,15 @@ export default function UsersList() {
                         <TableCell align="left">{row.date}</TableCell>
                         <TableCell align="left">
                           <Stack spacing={2} direction="row">
-                            <EditIcon
-                              style={{
-                                fontSize: "20px",
-                                color: "blue",
-                                cursor: "pointer",
-                              }}
-                              className="cursor-pointer"
-                              // onClick={() => editUser(row.id)}
-                            />
+                          <EditIcon
+                        style={{
+                          fontSize: "20px",
+                          color: "blue",
+                          cursor: "pointer",
+                        }}
+                        className="cursor-pointer"
+                        onClick={() => openEditModal(row)}
+                      />
                             <DeleteIcon
                               style={{
                                 fontSize: "20px",
@@ -200,6 +229,42 @@ export default function UsersList() {
           />
         </Paper>
       )}
+
+      <Modal open={editModalOpen} onClose={closeEditModal}>
+      <Box
+        sx={{
+          position: "absolute",
+          top: "50%",
+          left: "50%",
+          transform: "translate(-50%, -50%)",
+          width: 400,
+          bgcolor: "background.paper",
+          boxShadow: 24,
+          p: 4,
+        }}
+      >
+        <Typography variant="h6" component="div" gutterBottom>
+          Edit User
+        </Typography>
+        <TextField
+          label="Name"
+          value={editName}
+          onChange={(e) => setEditName(e.target.value)}
+          fullWidth
+          margin="normal"
+        />
+        <TextField
+          label="UID"
+          value={editUid}
+          onChange={(e) => setEditUid(e.target.value)}
+          fullWidth
+          margin="normal"
+        />
+        <Button variant="contained" onClick={updateUserData}>
+          Update
+        </Button>
+      </Box>
+    </Modal>
     </>
   );
 }
