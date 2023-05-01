@@ -142,7 +142,23 @@ const PageContainer = styled('div')({
           <Pie data={pieChartData} options={chartOptions} height={250} />
         </div>
       </Grid>
+      <Grid xs={6}>
+        <div style={{ border: '8px solid rgba(0, 0, 0, 0.5)', padding: '10px' }}>
+          <Pie data={pieChartData} options={chartOptions} height={250} />
+        </div>
+      </Grid>
+      <Grid xs={6}>
+        <div style={{ border: '8px solid rgba(0, 0, 0, 0.5)', padding: '10px' }}>
+          <Pie data={pieChartData} options={chartOptions} height={250} />
+        </div>
+      </Grid>
+      
     </Grid>
+    <Grid xs={6}>
+        <div style={{ border: '8px solid rgba(0, 0, 0, 0.5)', padding: '10px' }}>
+          <Pie data={pieChartData} options={chartOptions} height={250} />
+        </div>
+      </Grid>
   </div>
 </PageContainer>
   );

@@ -156,11 +156,11 @@ export default function ModerateForm() {
 
     return (
     <PageContainer>
-      <Sidebar  title = "Add Quiz"/>
+      <Sidebar  title = "Add User"/>
       <Box paddingTop="2rem">
         <FormContainer>
           <Typography variant="h4" component="h2" align="center">
-            Insert Quiz Details Below
+            Insert User Details Below
           </Typography>
           <StyledTextField
   name="name"

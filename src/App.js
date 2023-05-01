@@ -12,7 +12,7 @@ import  DeleteQuizPage  from './components/DeleteQuizPage';
 import UsageReportPage from './components/UsageReportPage';
 import OverallReportPage from './components/OvarallReportPage';
 import StudentReportPage from './components/StudentReportPage';
-
+import AddUserPage from './components/AddUserPage';
 
 // import { AuthProvider } from './Utility/Auth';
 
@@ -28,6 +28,7 @@ function App() {
           <Route path='/newpage' element={<ProtectedRoute><NewPage/></ProtectedRoute>} />
           <Route path='/createpage' element={<ProtectedRoute><CreatePage/></ProtectedRoute>} />
           <Route path='/addquizpage' element={<ProtectedRoute><AddQuizPage/></ProtectedRoute>} />
+          <Route path='/adduserpage' element={<ProtectedRoute><AddUserPage/></ProtectedRoute>} />
           <Route path='/deletequizpage' element={<ProtectedRoute><DeleteQuizPage/></ProtectedRoute>} />
           <Route path='/reports/usage' element={<ProtectedRoute><UsageReportPage/></ProtectedRoute>} />
           <Route path='/reports/overall' element={<ProtectedRoute><OverallReportPage/></ProtectedRoute>} />
