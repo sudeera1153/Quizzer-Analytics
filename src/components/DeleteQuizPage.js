@@ -1,6 +1,7 @@
 import React from "react";
 import { useEffect, useState } from "react";
 import { Modal } from "@mui/material";
+import { styled } from '@mui/system';
 import Paper from "@mui/material/Paper";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -31,6 +32,7 @@ import TextField from "@mui/material/TextField";
 import Autocomplete from "@mui/material/Autocomplete";
 import Sidebar from "../common/SideBar";
 import { CircularProgress } from "@mui/material";
+import coverImage from '../resources/coverpage.jpg';
 
 
 
@@ -72,6 +74,12 @@ export default function UsersList() {
       getUsers();
     }
   };
+
+  const PageContainer = styled('div')({
+    background: `url(${coverImage})`, // Replace with the actual path to your background image
+    backgroundSize: 'cover',
+    backgroundPosition: 'center',
+  });
 
   const openEditModal = (user) => {
     setEditModalOpen(true);
@@ -123,6 +131,7 @@ export default function UsersList() {
   return (
     <>
   <Sidebar title="Edit / Delete Quiz" />
+  <PageContainer>
   <Modal open={loading} onClose={() => {}}>
     <div
       style={{
@@ -301,6 +310,7 @@ export default function UsersList() {
         </Button>
       </Box>
     </Modal>
+  </PageContainer>
     </>
   );
 }

@@ -20,7 +20,7 @@ export const SidebarData = [
     subNav: [
       {
         title: 'Add User',
-        path: '/createpage',
+        path: '/adduserpage',
         icon: <IoIcons.IoIosPaper />
       },
       {
