@@ -187,8 +187,8 @@ export default function UsersList() {
                       >
                         <TableCell align="left">{row.name}</TableCell>
                         <TableCell align="left">{row.uid}</TableCell>
-                        <TableCell align="left">{row.category}</TableCell>
-                        <TableCell align="left">{row.date}</TableCell>
+                        <TableCell align="left">{row.username}</TableCell>
+                        <TableCell align="left">{row.age}</TableCell>
                         <TableCell align="left">
                           <Stack spacing={2} direction="row">
                           <EditIcon
