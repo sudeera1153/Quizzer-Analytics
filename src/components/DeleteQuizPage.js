@@ -30,6 +30,7 @@ import Swal from "sweetalert2";
 import TextField from "@mui/material/TextField";
 import Autocomplete from "@mui/material/Autocomplete";
 import Sidebar from "../common/SideBar";
+import { CircularProgress } from "@mui/material";
 
 
 
@@ -42,14 +43,17 @@ export default function UsersList() {
   const [editUser, setEditUser] = useState(null);
   const [editName, setEditName] = useState("");
   const [editUid, setEditUid] = useState("");
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     getUsers();
   }, []);
 
   const getUsers = async () => {
+    setLoading(true);
     const data = await getDocs(empCollectionRef);
     setRows(data.docs.map((doc) => ({ ...doc.data(), id: doc.id })));
+    setLoading(false);
   };
 
   const handleChangePage = (event, newPage) => {
@@ -118,117 +122,149 @@ export default function UsersList() {
 
   return (
     <>
-    <Sidebar title = "Edit / Delete Quiz"/>
-      {rows.length > 0 && (
-        <Paper sx={{ width: "98%", overflow: "hidden", padding: "12px" }}>
-          <Typography
-            gutterBottom
-            variant="h5"
-            component="div"
-            sx={{ padding: "20px" }}
-          >
-            Products List
-          </Typography>
-          <Divider />
-          <Box height={10} />
-          <Stack direction="row" spacing={2} className="my-2 mb-2">
-            <Autocomplete
-              disablePortal
-              id="combo-box-demo"
-              options={rows}
-              sx={{ width: 300 }}
-              onChange={(e, v) => filterData(v)}
-              getOptionLabel={(rows) => rows.name || ""}
-              renderInput={(params) => (
-                <TextField {...params} size="small" label="Search Products" />
-              )}
-            />
-            <Typography
-              variant="h6"
-              component="div"
-              sx={{ flexGrow: 1 }}
-            ></Typography>
-            <Button variant="contained" endIcon={<AddCircleIcon />}>
-              Add
-            </Button>
-          </Stack>
-          <Box height={10} />
-          <TableContainer>
-            <Table stickyHeader aria-label="sticky table">
-              <TableHead>
-                <TableRow>
-                  <TableCell align="left" style={{ minWidth: "100px" }}>
-                    Name
-                  </TableCell>
-                  <TableCell align="left" style={{ minWidth: "100px" }}>
-                    Price
-                  </TableCell>
-                  <TableCell align="left" style={{ minWidth: "100px" }}>
-                    Category
-                  </TableCell>
-                  <TableCell align="left" style={{ minWidth: "100px" }}>
-                    Date
-                  </TableCell>
-                  <TableCell align="left" style={{ minWidth: "100px" }}>
-                    Action
-                  </TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {rows
-                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                  .map((row) => {
-                    return (
-                      <TableRow
-                        hover
-                        role="checkbox"
-                        tabIndex={-1}
-                        key={row.code}
-                      >
-                        <TableCell align="left">{row.name}</TableCell>
-                        <TableCell align="left">{row.uid}</TableCell>
-                        <TableCell align="left">{row.username}</TableCell>
-                        <TableCell align="left">{row.age}</TableCell>
-                        <TableCell align="left">
-                          <Stack spacing={2} direction="row">
-                          <EditIcon
-                        style={{
-                          fontSize: "20px",
-                          color: "blue",
-                          cursor: "pointer",
-                        }}
-                        className="cursor-pointer"
-                        onClick={() => openEditModal(row)}
-                      />
-                            <DeleteIcon
-                              style={{
-                                fontSize: "20px",
-                                color: "darkred",
-                                cursor: "pointer",
-                              }}
-                              onClick={() => {
-                                deleteUser(row.id);
-                              }}
-                            />
-                          </Stack>
-                        </TableCell>
-                      </TableRow>
-                    );
-                  })}
-              </TableBody>
-            </Table>
-          </TableContainer>
-          <TablePagination
-            rowsPerPageOptions={[5, 10, 25]}
-            component="div"
-            count={rows.length}
-            rowsPerPage={rowsPerPage}
-            page={page}
-            onPageChange={handleChangePage}
-            onRowsPerPageChange={handleChangeRowsPerPage}
-          />
-        </Paper>
-      )}
+  <Sidebar title="Edit / Delete Quiz" />
+  <Modal open={loading} onClose={() => {}}>
+    <div
+      style={{
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        height: "100vh",
+      }}
+    >
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          background: "rgba(0, 0, 0, 0.5)",
+          padding: "20px",
+          borderRadius: "10px",
+        }}
+      >
+        <CircularProgress color="primary" size={80} />
+        <Typography
+          variant="h6"
+          component="div"
+          style={{ marginTop: "20px", color: "#fff" }}
+        >
+          Loading...
+        </Typography>
+      </div>
+    </div>
+  </Modal>
+  {!loading && rows.length > 0 && (
+    <Paper sx={{ width: "98%", overflow: "hidden", padding: "12px" }}>
+      <Typography
+        gutterBottom
+        variant="h5"
+        component="div"
+        sx={{
+          padding: "20px",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        Products List
+      </Typography>
+      <Divider />
+      <Box height={10} />
+      <Stack direction="row" spacing={2} className="my-2 mb-2">
+        <Autocomplete
+          disablePortal
+          id="combo-box-demo"
+          options={rows}
+          sx={{ width: 300 }}
+          onChange={(e, v) => filterData(v)}
+          getOptionLabel={(rows) => rows.name || ""}
+          renderInput={(params) => (
+            <TextField {...params} size="small" label="Search Products" />
+          )}
+        />
+        <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}></Typography>
+        {/* <Button variant="contained" endIcon={<AddCircleIcon />}>
+          Add
+        </Button> */}
+      </Stack>
+      <Box height={10} />
+      <TableContainer>
+        <Table stickyHeader aria-label="sticky table">
+          <TableHead>
+            <TableRow>
+              <TableCell align="left" style={{ minWidth: "100px" }}>
+                Name
+              </TableCell>
+              <TableCell align="left" style={{ minWidth: "100px" }}>
+                UID
+              </TableCell>
+              <TableCell align="left" style={{ minWidth: "100px" }}>
+                Username
+              </TableCell>
+              <TableCell align="left" style={{ minWidth: "100px" }}>
+                Age
+              </TableCell>
+              <TableCell align="left" style={{ minWidth: "100px" }}>
+                Action
+              </TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {rows
+              .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+              .map((row) => {
+                return (
+                  <TableRow
+                    hover
+                    role="checkbox"
+                    tabIndex={-1}
+                    key={row.id}
+                  >
+                    <TableCell align="left">{row.name}</TableCell>
+                    <TableCell align="left">{row.uid}</TableCell>
+                    <TableCell align="left">{row.username}</TableCell>
+                    <TableCell align="left">{row.age}</TableCell>
+                    <TableCell align="left">
+                      <Stack spacing={2} direction="row">
+                        <EditIcon
+                          style={{
+                            fontSize: "20px",
+                            color                            : "blue",
+                            cursor: "pointer",
+                          }}
+                          className="cursor-pointer"
+                          onClick={() => openEditModal(row)}
+                        />
+                        <DeleteIcon
+                          style={{
+                            fontSize: "20px",
+                            color: "darkred",
+                            cursor: "pointer",
+                          }}
+                          onClick={() => {
+                            deleteUser(row.id);
+                          }}
+                        />
+                      </Stack>
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
+          </TableBody>
+        </Table>
+      </TableContainer>
+      <TablePagination
+        rowsPerPageOptions={[5, 10, 25]}
+        component="div"
+        count={rows.length}
+        rowsPerPage={rowsPerPage}
+        page={page}
+        onPageChange={handleChangePage}
+        onRowsPerPageChange={handleChangeRowsPerPage}
+      />
+    </Paper>
+    )
+    }
 
       <Modal open={editModalOpen} onClose={closeEditModal}>
       <Box
