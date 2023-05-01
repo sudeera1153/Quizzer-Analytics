@@ -132,16 +132,18 @@ export default function ModerateForm() {
         draggable: false,
         progress: undefined,
       });
+
+      setPromptValues({
+        input1: '',
+        input2: '',
+        input3: '',
+        input4: '',
+        input5: '',
+        input6: ''
+      });
     }
     
-    setPromptValues({
-      input1: '',
-      input2: '',
-      input3: '',
-      input4: '',
-      input5: '',
-      input6: ''
-    });
+    
   };
 
   const handleDonePrompt = () => {
@@ -205,42 +207,42 @@ export default function ModerateForm() {
   <DialogContent>
     <StyledTextField
       name="input1"
-      label="Input 1"
+      label="Enter The Question"
       value={promptValues.input1}
       onChange={handlePromptChange}
       style={{ margin: '0.5rem 0' }}
     />
     <StyledTextField
       name="input2"
-      label="Input 2"
+      label="Enter The Correct Answer"
       value={promptValues.input2}
       onChange={handlePromptChange}
       style={{ margin: '0.5rem 0' }}
     />
     <StyledTextField
       name="input3"
-      label="Input 3"
+      label="Enter MCQ Answer 1"
       value={promptValues.input3}
       onChange={handlePromptChange}
       style={{ margin: '0.5rem 0' }}
     />
     <StyledTextField
       name="input4"
-      label="Input 4"
+      label="Enter MCQ Answer 2"
       value={promptValues.input4}
       onChange={handlePromptChange}
       style={{ margin: '0.5rem 0' }}
     />
     <StyledTextField
       name="input5"
-      label="Input 5"
+      label="Enter MCQ Answer 3"
       value={promptValues.input5}
       onChange={handlePromptChange}
       style={{ margin: '0.5rem 0' }}
     />
     <StyledTextField
       name="input6"
-      label="Input 6"
+      label="Enter MCQ Answer 4"
       value={promptValues.input6}
       onChange={handlePromptChange}
       style={{ margin: '0.5rem 0' }}
