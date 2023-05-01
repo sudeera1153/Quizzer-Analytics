@@ -25,7 +25,7 @@ export const SidebarData = [
       },
       {
         title: 'Delete User',
-        path: '/overview/revenue',
+        path: '/deleteuserpage',
         icon: <IoIcons.IoIosPaper />
       }
     ]
