@@ -1,4 +1,4 @@
-# Quiz Mark Analytics and Administration React Web Site
+# Quizer - A Continous Evaluating & Analytical System
 
 ## Introduction
 This repository contains the source code for a web application built with React that enables quiz mark analytics and administration. The application provides a user-friendly interface for analyzing quiz marks and managing quiz-related data.
