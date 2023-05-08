@@ -39,6 +39,7 @@ import {
   
 } from "firebase/storage";
 import { Padding } from '@mui/icons-material';
+import Swal from 'sweetalert2';
 
 
 
@@ -223,7 +224,10 @@ export default function ModerateForm() {
         input5: '',
         input6: ''
       });
-      setImageUpload('');
+      document.getElementById('fileInput').value = null;
+      setImageUpload(null);
+      imageUrl=''
+      
 
     } 
     else{
@@ -243,7 +247,15 @@ export default function ModerateForm() {
 
   const handleDonePrompt = () => {
     handleClosePrompt();
-    console.log(values);
+    Swal.fire("Quiz Added!", "Quiz has been succesfully added!.", "success").then(()=>{
+      setValues({
+        title: '',
+        description:'',
+        corearea: '',
+        subject:'',
+        level:''
+      })      
+    })
   };
 
     return (
@@ -338,6 +350,7 @@ export default function ModerateForm() {
   <Typography>Insert Image (Not Requied)</Typography>
       <input
         type="file"
+        id='fileinput'
         onChange={(event) => {
           setImageUpload(event.target.files[0]);
         }}
