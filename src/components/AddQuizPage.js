@@ -16,12 +16,13 @@ import {
 import { styled } from '@mui/system';
 import coverImage from '../resources/coverpage.jpg';
 import Sidebar from '../common/SideBar';
-import { db } from "../Utility/firebase";
+import { db , storage} from "../Utility/firebase";
 import {
   collection,
   getDocs,
   addDoc,
   updateDoc,
+  setDoc,
   deleteDoc,
   doc,
   query,
@@ -29,6 +30,18 @@ import {
 } from "firebase/firestore";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import {
+  ref,
+  uploadBytes,
+  getDownloadURL,
+  listAll,
+  list,
+  
+} from "firebase/storage";
+import { Padding } from '@mui/icons-material';
+
+
+
 
 const quizzesCollectionRef = collection(db, "Quizzes");
 
@@ -58,17 +71,47 @@ const SubmitButton = styled(Button)({
 });
 
 export default function ModerateForm() {
+
+  // const currentQuizId = Math.floor(100000 + Math.random() * 9000).toString();
+
+  // const [currquizid,setCurrquizid] = useState(null)
+  const [imageUpload, setImageUpload] = useState(null);
+  let currquizid = '';
+  const [currentQuizId, setCurrquizid] = useState('')
+
+  
+
+  const uploadFile = async() => {
+    if (imageUpload == null) return;
+    const imageRef = ref(storage, `images/${imageUpload.name}`);
+    await uploadBytes(imageRef, imageUpload).then((snapshot) => {
+    console.log("image uploaded")
+    });
+    await getFileURL();
+    
+
+  };
+
+  let imageUrl = ''
+  const getFileURL = async() => {
+    const imageRef = ref(storage, `images/${imageUpload.name}`)
+    imageUrl = await getDownloadURL(ref(storage, imageRef))
+    console.log(imageUrl)
+  }
+  
+
   const [values, setValues] = useState({
-    name: '',
-    email: '',
-    message: '',
-    category: ''
+    title: '',
+    description:'',
+    corearea: '',
+    subject:'',
+    level:'',
   });
 
   const [openPrompt, setOpenPrompt] = useState(false);
   
   const [promptValues, setPromptValues] = useState({
-    input1: '',
+    Question: '',
     input2: '',
     input3: '',
     input4: '',
@@ -77,6 +120,7 @@ export default function ModerateForm() {
   });
 
   const handleChange = (e) => {
+    
     const { name, value } = e.target;
     setValues((prevValues) => ({
       ...prevValues,
@@ -93,7 +137,39 @@ export default function ModerateForm() {
   };
 
   const handleSubmit = async (e) => {
-    handleOpenPrompt();
+
+    // let crquid = Math.floor(100000 + Math.random() * 9000).toString()
+    
+
+    if(values.title == "" || values.description == "" || values.corearea == "" || values.subject == "" || values.level == "" )
+    {
+      toast.error('Please Fill Out All The Input Fields', {
+        position: 'top-left', 
+        autoClose: 5000, 
+        hideProgressBar: false, 
+        closeOnClick: true,
+        pauseOnHover: true, 
+        draggable: false, 
+        progress: undefined, 
+       
+      });
+    }
+    else{
+      currquizid = Math.floor(100000 + Math.random() * 9000).toString();
+      await setDoc(doc(db, "Quizzes", currquizid), {
+        title: values.title,
+        description: values.description,
+        coreArea: values.corearea,
+        subject: values.subject,
+        level: values.level
+      }).then(
+        console.log(currquizid),
+        setCurrquizid(currquizid)
+      );
+      handleOpenPrompt();
+    }
+
+    
   };
 
   const handleOpenPrompt = () => {
@@ -104,52 +180,68 @@ export default function ModerateForm() {
     setOpenPrompt(false);
   };
 
-  const handleAddPrompt = () => {
+  const handleAddPrompt = async() => {
+    let currentQuestionId = Math.floor(100000 + Math.random() * 9000,).toString();
+
+    if(promptValues.Question === "" || promptValues.input2 === "" || promptValues.input4 === "" || promptValues.input5 === "" || promptValues.input6 === "" )
+   {
+    toast.error('Please Fill All The Blanks', 
+    {
+      position: 'top-center',
+      autoClose: 1000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: false,
+      draggable: false,
+      progress: undefined,
+    });
+
+   }
+   else{
     if (
-      promptValues.input2 !== promptValues.input3 &&
       promptValues.input2 !== promptValues.input4 &&
       promptValues.input2 !== promptValues.input5 &&
       promptValues.input2 !== promptValues.input6
     ) {
-      // Error toast message
-      toast.error('Error', {
-        position: 'top-center',
-        autoClose: 1000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: false,
-        draggable: false,
-        progress: undefined,
-      });
-    } else {
-      // Success toast message
-      toast.success('Success', {
-        position: 'top-center',
-        autoClose: 1000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: false,
-        draggable: false,
-        progress: undefined,
-      });
-
+      await uploadFile().then(async()=>{
+        const quizzesRef = doc(db, 'Quizzes',currentQuizId, 'QNA', currentQuestionId);
+        console.log(currquizid)
+        await setDoc(quizzesRef, {
+          question:promptValues.Question,
+          correct_answer: promptValues.input2,
+          incorrect_answers: [promptValues.input4, promptValues.input5, promptValues.input6],
+          imageUrl: imageUrl
+        }
+        );
+      }
+      )
       setPromptValues({
-        input1: '',
+        Question: '',
         input2: '',
         input3: '',
         input4: '',
         input5: '',
         input6: ''
       });
+      setImageUpload('');
+
+    } 
+    else{
+      toast.success('Error Eroor', 
+      {
+        position: 'top-center',
+        autoClose: 1000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: false,
+        progress: undefined,
+      });
     }
-    
-    
-  };
+  }
+};
 
   const handleDonePrompt = () => {
-    // Perform any necessary action when the "Done" button is clicked in the prompt modal
-    // Example: Close the prompt modal and proceed with form submission
-
     handleClosePrompt();
     console.log(values);
   };
@@ -163,37 +255,66 @@ export default function ModerateForm() {
             Insert Quiz Details Below
           </Typography>
           <StyledTextField
-  name="name"
-  label="Name"
-  value={values.name}
+  name="title"
+  label="Enter Quiz Title"
+  value={values.title}
   onChange={handleChange}
 />
 <StyledTextField
-  name="email"
-  label="Email"
-  value={values.email}
-  onChange={handleChange}
-/>
-<StyledTextField
-  name="message"
-  label="Message"
-  value={values.message}
+  name="description"
+  label="Enter Quiz Description"
+  value={values.description}
   onChange={handleChange}
   multiline
   rows={4}
 />
+
 <FormControl>
-  <InputLabel>Select Category</InputLabel>
+  <InputLabel>Select Core Area</InputLabel>
   <Select
-    name="category"
-    value={values.category}
+    name="corearea"
+    value={values.corearea}
     onChange={handleChange}
   >
-    <MenuItem value="programming_in_c">Programming in C</MenuItem>
-    <MenuItem value="mathematics_for_computing">Mathematics for Computing</MenuItem>
-    <MenuItem value="java">Java</MenuItem>
+    <MenuItem value="programming">Programming</MenuItem>
+    <MenuItem value="computationaltheory">Computational Theory</MenuItem>
+    <MenuItem value="dataandquerrying">Data & Querrying</MenuItem>
+    <MenuItem value="aiandml">AI & Machine Learning</MenuItem>
   </Select>
 </FormControl>
+
+<FormControl>
+  <InputLabel>Select Subject</InputLabel>
+  <Select
+    name="subject"
+    value={values.subject}
+    onChange={handleChange}
+  >
+    <MenuItem value="csharp">C#</MenuItem>
+    <MenuItem value="python">Python</MenuItem>
+    <MenuItem value="comuter_architecture">Computer Architecture</MenuItem>
+    <MenuItem value="java">Java</MenuItem>
+    <MenuItem value="scala">Scala</MenuItem>
+    <MenuItem value="advanced_sql">Advanced SQL</MenuItem>
+    <MenuItem value="cryptography">Cryptography</MenuItem>
+    <MenuItem value="networking_fundamentals">Networking Fundamentals</MenuItem>
+  </Select>
+</FormControl>
+
+<FormControl>
+  <InputLabel>Select Difficulty</InputLabel>
+  <Select
+    name="level"
+    value={values.level}
+    onChange={handleChange}
+  >
+    <MenuItem value="Beginner">Beginner</MenuItem>
+    <MenuItem value="Intermidiate">Intermidiate</MenuItem>
+    <MenuItem value="Pro">Pro</MenuItem>
+    <MenuItem value="Master">Master</MenuItem>
+  </Select>
+</FormControl>
+
 <SubmitButton
   type="submit"
   variant="contained"
@@ -206,23 +327,28 @@ export default function ModerateForm() {
   <DialogTitle>Add Questions</DialogTitle>
   <DialogContent>
     <StyledTextField
-      name="input1"
+      name="Question"
       label="Enter The Question"
-      value={promptValues.input1}
+      value={promptValues.Question}
       onChange={handlePromptChange}
       style={{ margin: '0.5rem 0' }}
     />
+
+  <div>
+  <Typography>Insert Image (Not Requied)</Typography>
+      <input
+        type="file"
+        onChange={(event) => {
+          setImageUpload(event.target.files[0]);
+        }}
+      />
+      {/* <button onClick={uploadFile}> Upload Image</button> */}  
+  </div>
+
     <StyledTextField
       name="input2"
       label="Enter The Correct Answer"
       value={promptValues.input2}
-      onChange={handlePromptChange}
-      style={{ margin: '0.5rem 0' }}
-    />
-    <StyledTextField
-      name="input3"
-      label="Enter MCQ Answer 1"
-      value={promptValues.input3}
       onChange={handlePromptChange}
       style={{ margin: '0.5rem 0' }}
     />
@@ -258,4 +384,5 @@ export default function ModerateForm() {
 </Box>
 </PageContainer>
 );
-    }
+}
+  
