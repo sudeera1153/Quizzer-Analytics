@@ -40,12 +40,16 @@ export default function UsersList() {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [rows, setRows] = useState([]);
-  const empCollectionRef = collection(db, "users");
+  const empCollectionRef = collection(db, "Quizzes");
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [editUser, setEditUser] = useState(null);
-  const [editName, setEditName] = useState("");
-  const [editUid, setEditUid] = useState("");
+  // const [editName, setEditName] = useState("");
+  // const [editUid, setEditUid] = useState("");
   const [loading, setLoading] = useState(true);
+  const [values, setValues] = useState({
+    name: '',
+    uid:''
+  });
 
   useEffect(() => {
     getUsers();
@@ -84,24 +88,31 @@ export default function UsersList() {
   const openEditModal = (user) => {
     setEditModalOpen(true);
     setEditUser(user);
-    setEditName(user.name);
-    setEditUid(user.uid);
+    setValues({
+      name: user.title,
+      uid: user.description
+    })
   };
 
   const closeEditModal = () => {
     setEditModalOpen(false);
     setEditUser(null);
-    setEditName("");
-    setEditUid("");
+    setValues({
+      name: '',
+      uid: ''
+    })
+    // setEditName("");
+    // setEditUid("");
   };
 
   const updateUserData = async () => {
   if (editUser) {
-    const userDoc = doc(db, "users", editUser.id);
-    await updateDoc(userDoc, { name: editName, uid: editUid });
-    Swal.fire("Updated!", "User data has been updated.", "success");
+    // const userDoc = doc(db, "users", editUser.id);
+    // await updateDoc(userDoc, { name: values.name, uid: values.uid });
+    // Swal.fire("Updated!", "User data has been updated.", "success");
+    console.log(values.name,values.uid)
     closeEditModal();
-    getUsers();
+    // getUsers();
   }
 };
 
@@ -121,8 +132,17 @@ export default function UsersList() {
     });
   };
 
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setValues((prevValues) => ({
+      ...prevValues,
+      [name]: value
+    }));
+  };
+
   const deleteApi = async (id) => {
-    const userDoc = doc(db, "users", id);
+    const userDoc = doc(db, "Quizzes", id);
     await deleteDoc(userDoc);
     Swal.fire("Deleted!", "Your file has been deleted.", "success");
     getUsers();
@@ -175,7 +195,7 @@ export default function UsersList() {
           alignItems: "center",
         }}
       >
-        Products List
+        Quizzes List
       </Typography>
       <Divider />
       <Box height={10} />
@@ -202,16 +222,16 @@ export default function UsersList() {
           <TableHead>
             <TableRow>
               <TableCell align="left" style={{ minWidth: "100px" }}>
-                Name
+                Title
               </TableCell>
               <TableCell align="left" style={{ minWidth: "100px" }}>
-                UID
+                Description
               </TableCell>
               <TableCell align="left" style={{ minWidth: "100px" }}>
-                Username
+                Subject
               </TableCell>
               <TableCell align="left" style={{ minWidth: "100px" }}>
-                Age
+                Level
               </TableCell>
               <TableCell align="left" style={{ minWidth: "100px" }}>
                 Action
@@ -229,10 +249,10 @@ export default function UsersList() {
                     tabIndex={-1}
                     key={row.id}
                   >
-                    <TableCell align="left">{row.name}</TableCell>
-                    <TableCell align="left">{row.uid}</TableCell>
-                    <TableCell align="left">{row.username}</TableCell>
-                    <TableCell align="left">{row.age}</TableCell>
+                    <TableCell align="left">{row.title}</TableCell>
+                    <TableCell align="left">{row.description}</TableCell>
+                    <TableCell align="left">{row.subject}</TableCell>
+                    <TableCell align="left">{row.level}</TableCell>
                     <TableCell align="left">
                       <Stack spacing={2} direction="row">
                         <EditIcon
@@ -275,7 +295,9 @@ export default function UsersList() {
     )
     }
 
-      <Modal open={editModalOpen} onClose={closeEditModal}>
+
+  </PageContainer>
+  <Modal open={editModalOpen} onClose={closeEditModal}>
       <Box
         sx={{
           position: "absolute",
@@ -292,16 +314,18 @@ export default function UsersList() {
           Edit User
         </Typography>
         <TextField
-          label="Name"
-          value={editName}
-          onChange={(e) => setEditName(e.target.value)}
+          name="name"
+          label="name"
+          defaultValue={values.name}
+          onChange={handleChange}
           fullWidth
           margin="normal"
         />
         <TextField
+          name="uid"
           label="UID"
-          value={editUid}
-          onChange={(e) => setEditUid(e.target.value)}
+          defaultValue={values.uid}
+          onChange={handleChange}
           fullWidth
           margin="normal"
         />
@@ -310,7 +334,7 @@ export default function UsersList() {
         </Button>
       </Box>
     </Modal>
-  </PageContainer>
     </>
+    
   );
 }
