@@ -1,5 +1,7 @@
 import React , {useState} from 'react';
 import firebase from 'firebase/compat/app';
+import { Modal } from "@mui/material";
+import { CircularProgress } from "@mui/material";
 import 'firebase/compat/auth';
 import 'firebase/compat/firestore';
 import Avatar from '@mui/material/Avatar';
@@ -21,6 +23,16 @@ import { UserAuth } from '../context/AuthContext';
 import coverImage from '../resources/quizzercover.jpg';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { db } from "../Utility/firebase";
+import {
+  collection,
+  getDocs,
+  addDoc,
+  updateDoc,
+  deleteDoc,
+  doc,
+  getDoc
+} from "firebase/firestore";
 
 // Initialize Firebase
 // const firebaseConfig = {
@@ -42,21 +54,64 @@ const LoginPage = () => {
   const navigate = useNavigate();
   const {signIn} = UserAuth();
   const [rememberMe, setRememberMe] = useState(false);
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const handleLogin = async(e) => {
+    setLoading(true);
     e.preventDefault();
     setError('')
+    const userDocRef = doc(db, 'users', email);
+
+    await getDoc(userDocRef)
+      .then((doc) => {
+        if (doc.exists()) {
+          const data = doc.data();
+          const userType = data.usertype;
+          console.log(`User type: ${userType}`);
+          if(data.usertype === 'admin'){
+            signin();
+          }
+          else{
+            toast.error('User Does Not Have Administrator Previlages', {
+              position: 'top-left', 
+              autoClose: 5000, 
+              hideProgressBar: false, 
+              closeOnClick: true, 
+              pauseOnHover: true, 
+              draggable: false,
+              progress: undefined, 
+            });
+          }
+        } else {
+          toast.error('User Does Not Exist!', {
+            position: 'top-left', 
+            autoClose: 5000, 
+            hideProgressBar: false, 
+            closeOnClick: true, 
+            pauseOnHover: true, 
+            draggable: false,
+            progress: undefined, 
+          });
+        }
+      })
+      .catch((error) => {
+        console.log('Error getting document:', error);
+      });   
+      setLoading(false);
+  };
+
+  const signin = async() => {
     try{
       await signIn(email,password,rememberMe)
       toast.success('Login Success', {
-        position: 'top-center', // position of the toast message
-        autoClose: 1000, // auto close duration in milliseconds
-        hideProgressBar: false, // whether to hide the progress bar
-        closeOnClick: true, // close the toast on click
-        pauseOnHover: false, // pause the toast on hover
-        draggable: false, // make the toast draggable
-        progress: undefined, // custom progress bar component
-        // you can customize more options here, refer to the documentation for more details
+        position: 'top-center', 
+        autoClose: 1000, 
+        hideProgressBar: false, 
+        closeOnClick: true, 
+        pauseOnHover: false,
+        draggable: false, 
+        progress: undefined,
       });
       navigate('/homepage')
     }
@@ -74,11 +129,42 @@ const LoginPage = () => {
         // you can customize more options here, refer to the documentation for more details
       });
     }
-    
-  };
+
+  }
   const theme = createTheme();
   return (
+    
     <ThemeProvider theme={theme}>
+     <Modal open={loading} onClose={() => {}}>
+    <div
+      style={{
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        height: "100vh",
+      }}
+    >
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          background: "rgba(0, 0, 0, 0.5)",
+          padding: "20px",
+          borderRadius: "10px",
+        }}
+      >
+        <CircularProgress color="primary" size={80} />
+        <Typography
+          variant="h6"
+          component="div"
+          style={{ marginTop: "20px", color: "#fff" }}
+        >
+          Loading...
+        </Typography>
+      </div>
+    </div>
+  </Modal>
       <Grid container component="main" sx={{ height: '100vh' }}>
         <CssBaseline />
         <Grid

@@ -4,6 +4,10 @@ import * as AiIcons from 'react-icons/ai';
 import * as IoIcons from 'react-icons/io';
 import * as RiIcons from 'react-icons/ri';
 
+const click= () => {
+  console.log('ss')
+}
+
 
 export const SidebarData = [
   {
@@ -73,9 +77,12 @@ export const SidebarData = [
       }
     ]
   },
-  {
-    title: 'Log Out',
-    path: '/',
-    icon: <IoIcons.IoMdHelpCircle />
-  }
+  // {
+  //   title: 'Log Out',
+  //   // path: '/',
+  //   icon: <IoIcons.IoMdHelpCircle />,
+  //   onclick: {click}
+    
+    
+  // }
 ];

@@ -80,7 +80,7 @@ export default function UsersList() {
   };
 
   const PageContainer = styled('div')({
-    background: `url(${coverImage})`, // Replace with the actual path to your background image
+    background: `url(${coverImage})`,
     backgroundSize: 'cover',
     backgroundPosition: 'center',
   });
@@ -206,11 +206,15 @@ export default function UsersList() {
           options={rows}
           sx={{ width: 300 }}
           onChange={(e, v) => filterData(v)}
-          getOptionLabel={(rows) => rows.name || ""}
+          getOptionLabel={(rows) => rows.title || ""}
           renderInput={(params) => (
-            <TextField {...params} size="small" label="Search Products" />
+            <TextField {...params} size="small" label="Search Quizzes" />
+            
           )}
+          
         />
+        <Button
+        onClick={getUsers}>Clear Filter</Button>
         <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}></Typography>
         {/* <Button variant="contained" endIcon={<AddCircleIcon />}>
           Add
@@ -234,6 +238,24 @@ export default function UsersList() {
                 Level
               </TableCell>
               <TableCell align="left" style={{ minWidth: "100px" }}>
+                Level2
+              </TableCell>
+              <TableCell align="left" style={{ minWidth: "100px" }}>
+                Level3
+              </TableCell>
+              <TableCell align="left" style={{ minWidth: "100px" }}>
+                Level2
+              </TableCell>
+              <TableCell align="left" style={{ minWidth: "100px" }}>
+                Level3
+              </TableCell>
+              <TableCell align="left" style={{ minWidth: "100px" }}>
+                Level2
+              </TableCell>
+              <TableCell align="left" style={{ minWidth: "100px" }}>
+                Level3
+              </TableCell>
+              <TableCell align="left" style={{ minWidth: "100px" }}>
                 Action
               </TableCell>
             </TableRow>
@@ -253,9 +275,15 @@ export default function UsersList() {
                     <TableCell align="left">{row.description}</TableCell>
                     <TableCell align="left">{row.subject}</TableCell>
                     <TableCell align="left">{row.level}</TableCell>
+                    <TableCell align="left">{row.description}</TableCell>
+                    <TableCell align="left">{row.subject}</TableCell>
+                    <TableCell align="left">{row.description}</TableCell>
+                    <TableCell align="left">{row.subject}</TableCell>
+                    <TableCell align="left">{row.description}</TableCell>
+                    <TableCell align="left">{row.subject}</TableCell>
                     <TableCell align="left">
                       <Stack spacing={2} direction="row">
-                        <EditIcon
+                        {/* <EditIcon
                           style={{
                             fontSize: "20px",
                             color                            : "blue",
@@ -263,7 +291,7 @@ export default function UsersList() {
                           }}
                           className="cursor-pointer"
                           onClick={() => openEditModal(row)}
-                        />
+                        /> */}
                         <DeleteIcon
                           style={{
                             fontSize: "20px",
