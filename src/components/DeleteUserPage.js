@@ -44,7 +44,12 @@ export default function UsersList() {
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [editUser, setEditUser] = useState(null);
   const [editName, setEditName] = useState("");
-  const [editUid, setEditUid] = useState("");
+  const [editUsertype, setEditUsertype] = useState("");
+  const [editAgegroup, setEditagegroup] = useState("");
+  const [editIntake, setEditIntake] = useState("");
+  const [editDegree, setEditDegree] = useState("");
+  const [editDepartment, setEditDepartment] = useState("");
+  const [editContactNo, setEditContactNo] = useState("");
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -85,20 +90,25 @@ export default function UsersList() {
     setEditModalOpen(true);
     setEditUser(user);
     setEditName(user.name);
-    setEditUid(user.uid);
+    setEditUsertype(user.usertype)
+    setEditagegroup(user.agegroup)
+    setEditIntake(user.intake)
+    setEditDegree(user.degree)
+    setEditDepartment(user.department)
+    setEditContactNo(user.contactno)
+
   };
 
   const closeEditModal = () => {
     setEditModalOpen(false);
     setEditUser(null);
     setEditName("");
-    setEditUid("");
   };
 
   const updateUserData = async () => {
   if (editUser) {
     const userDoc = doc(db, "users", editUser.id);
-    await updateDoc(userDoc, { name: editName, uid: editUid });
+    await updateDoc(userDoc, { name: editName , usertype: editUsertype , agegroup: editAgegroup, intake: editIntake, degree: editDegree, department: editDepartment, contactno: editContactNo});
     Swal.fire("Updated!", "User data has been updated.", "success");
     closeEditModal();
     getUsers();
@@ -175,7 +185,7 @@ export default function UsersList() {
           alignItems: "center",
         }}
       >
-        Products List
+        List of Users
       </Typography>
       <Divider />
       <Box height={10} />
@@ -188,7 +198,7 @@ export default function UsersList() {
           onChange={(e, v) => filterData(v)}
           getOptionLabel={(rows) => rows.name || ""}
           renderInput={(params) => (
-            <TextField {...params} size="small" label="Search Products" />
+            <TextField {...params} size="small" label="Search Users" />
           )}
         />
         <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}></Typography>
@@ -202,16 +212,25 @@ export default function UsersList() {
           <TableHead>
             <TableRow>
               <TableCell align="left" style={{ minWidth: "100px" }}>
+                User Type
+              </TableCell>
+              <TableCell align="left" style={{ minWidth: "100px" }}>
                 Name
               </TableCell>
               <TableCell align="left" style={{ minWidth: "100px" }}>
-                UID
+                Age Group
               </TableCell>
               <TableCell align="left" style={{ minWidth: "100px" }}>
-                Username
+                Intake
               </TableCell>
               <TableCell align="left" style={{ minWidth: "100px" }}>
-                Age
+                Degree
+              </TableCell>
+              <TableCell align="left" style={{ minWidth: "100px" }}>
+                Department
+              </TableCell>
+              <TableCell align="left" style={{ minWidth: "100px" }}>
+                Contact Number
               </TableCell>
               <TableCell align="left" style={{ minWidth: "100px" }}>
                 Action
@@ -229,10 +248,13 @@ export default function UsersList() {
                     tabIndex={-1}
                     key={row.id}
                   >
+                    <TableCell align="left">{row.usertype}</TableCell>
                     <TableCell align="left">{row.name}</TableCell>
-                    <TableCell align="left">{row.uid}</TableCell>
-                    <TableCell align="left">{row.username}</TableCell>
-                    <TableCell align="left">{row.age}</TableCell>
+                    <TableCell align="left">{row.agegroup}</TableCell>
+                    <TableCell align="left">{row.intake}</TableCell>
+                    <TableCell align="left">{row.degree}</TableCell>
+                    <TableCell align="left">{row.department}</TableCell>
+                    <TableCell align="left">{row.contactno}</TableCell>
                     <TableCell align="left">
                       <Stack spacing={2} direction="row">
                         <EditIcon
@@ -275,7 +297,9 @@ export default function UsersList() {
     )
     }
 
-      <Modal open={editModalOpen} onClose={closeEditModal}>
+      
+  </PageContainer>
+  <Modal open={editModalOpen} onClose={closeEditModal}>
       <Box
         sx={{
           position: "absolute",
@@ -292,6 +316,13 @@ export default function UsersList() {
           Edit User
         </Typography>
         <TextField
+          label="Usertype"
+          value={editUsertype}
+          onChange={(e) => setEditUsertype(e.target.value)}
+          fullWidth
+          margin="normal"
+        />
+        <TextField
           label="Name"
           value={editName}
           onChange={(e) => setEditName(e.target.value)}
@@ -299,18 +330,46 @@ export default function UsersList() {
           margin="normal"
         />
         <TextField
-          label="UID"
-          value={editUid}
-          onChange={(e) => setEditUid(e.target.value)}
+          label="Age Grou["
+          value={editAgegroup}
+          onChange={(e) => setEditagegroup(e.target.value)}
           fullWidth
           margin="normal"
         />
+        <TextField
+          label="Intake"
+          value={editIntake}
+          onChange={(e) => setEditIntake(e.target.value)}
+          fullWidth
+          margin="normal"
+        />
+        <TextField
+          label="Degree"
+          value={editDegree}
+          onChange={(e) => setEditDegree(e.target.value)}
+          fullWidth
+          margin="normal"
+        />
+        <TextField
+          label="Department"
+          value={editDepartment}
+          onChange={(e) => setEditDepartment(e.target.value)}
+          fullWidth
+          margin="normal"
+        />
+        <TextField
+          label="Contact No"
+          value={editContactNo}
+          onChange={(e) => setEditContactNo(e.target.value)}
+          fullWidth
+          margin="normal"
+        />
+        
         <Button variant="contained" onClick={updateUserData}>
           Update
         </Button>
       </Box>
     </Modal>
-  </PageContainer>
     </>
   );
 }

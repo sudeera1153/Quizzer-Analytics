@@ -49,7 +49,7 @@ const queries = [  { field: 'intake', values: ['19.1', '19.2', '20.1', '20.2'] }
 
 const snapshots = await Promise.all(
   queries.map(async ({ field, values }) => {
-    const queries = values.map(value => query(usersRef, where(field, '==', value)));
+    const queries = values.map(value => query(usersRef, where(field, '==', value),where('usertype','==','default user')));
     const snapshots = await Promise.all(queries.map(getDocs));
     return snapshots.map(snapshot => snapshot.size);
   })
@@ -116,14 +116,13 @@ setDeptcount_infsys(deptcount_infsys);
 
   
 const PageContainer = styled('div')({
-    // background: `url(${coverImage})`, // Replace with the actual path to your background image
-    backgroundSize: 'cover',
+    // background: `url(${coverImage})`, 
     backgroundPosition: 'center',
   });
 
   const StyledTextField = styled(TextField)({
     width: '70%',
-    height: '5% '// Adjust the width as desired
+    height: '5% '
   });
   
 

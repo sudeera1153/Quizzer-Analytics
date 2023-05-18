@@ -13,6 +13,8 @@ import {
   DialogContent,
   DialogActions
 } from '@mui/material';
+import { Modal } from "@mui/material";
+import { CircularProgress } from "@mui/material";
 import { styled } from '@mui/system';
 import coverImage from '../resources/coverpage.jpg';
 import Sidebar from '../common/SideBar';
@@ -24,13 +26,16 @@ import {
   updateDoc,
   deleteDoc,
   doc,
+  setDoc,
   query,
   where
 } from "firebase/firestore";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth';
 
 const quizzesCollectionRef = collection(db, "Quizzes");
+const auth = getAuth();
 
 const PageContainer = styled('div')({
   background: `url(${coverImage})`, // Replace with the actual path to your background image
@@ -59,11 +64,13 @@ const SubmitButton = styled(Button)({
 
 export default function ModerateForm() {
   const [values, setValues] = useState({
-    name: '',
     email: '',
-    message: '',
-    category: ''
-  });
+    password: '',
+    retypepassword: '',
+    name: '',
+    designation: '',
+    employmenttype:'',
+    });
 
   const [openPrompt, setOpenPrompt] = useState(false);
   
@@ -75,6 +82,8 @@ export default function ModerateForm() {
     input5: '',
     input6: ''
   });
+
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -93,7 +102,82 @@ export default function ModerateForm() {
   };
 
   const handleSubmit = async (e) => {
-    handleOpenPrompt();
+    setLoading(true)
+    if(values.email==''|| values.password=='' || values.retypepassword=='' || values.name=='' || values.designation=='' || values.employmenttype==''){
+      toast.error('Please Fill Out All The Input Fields', {
+        position: 'top-left', 
+        autoClose: 5000, 
+        hideProgressBar: false, 
+        closeOnClick: true,
+        pauseOnHover: true, 
+        draggable: false, 
+        progress: undefined, 
+       
+      });
+    }else{
+     if(values.password === values.retypepassword){
+      if(values.password.length>6){
+        createUserWithEmailAndPassword(auth,(values.email),(values.password)).then(
+          await setDoc(doc(db, "users", values.email), {
+              name: values.name,
+              designation: values.designation,
+              employmenttype: values.employmenttype,
+              usertype: 'admin'}).then(
+                setLoading(false)
+              )
+        )
+        // await setDoc(doc(db, "users", values.email), {
+        //   name: values.name,
+        //   designation: values.designation,
+        //   employmenttype: values.employmenttype,
+        //   usertype: 'admin'
+        // }).then(
+        //   createUserWithEmailAndPassword(auth, values.email, values.password).then(
+          
+        //   ).catch(err =>
+        //             toast.error(err, {
+        //   position: 'top-left', 
+        //   autoClose: 5000, 
+        //   hideProgressBar: false, 
+        //   closeOnClick: true,
+        //   pauseOnHover: true, 
+        //   draggable: false, 
+        //   progress: undefined, 
+        // })
+        //   ),
+        // )
+      }else{
+        toast.error('Password Must be At-Least 6 Char Long', {
+          position: 'top-left', 
+          autoClose: 5000, 
+          hideProgressBar: false, 
+          closeOnClick: true,
+          pauseOnHover: true, 
+          draggable: false, 
+          progress: undefined, 
+        });
+      }
+     }
+     else{
+      toast.error('Please recheck the passwords', {
+        position: 'top-left', 
+        autoClose: 5000, 
+        hideProgressBar: false, 
+        closeOnClick: true,
+        pauseOnHover: true, 
+        draggable: false, 
+        progress: undefined, 
+      });
+     }
+
+    }
+    values.username =''
+    values.password =''
+    values.retypepassword = ''
+    values.name =''
+    values.employmenttype = ''
+    values.designation = ''
+    setLoading(false)
   };
 
   const handleOpenPrompt = () => {
@@ -156,52 +240,103 @@ export default function ModerateForm() {
 
     return (
     <PageContainer>
-      <Sidebar  title = "Add User"/>
+         <Modal open={loading} onClose={() => {}}>
+    <div
+      style={{
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        height: "100vh",
+      }}
+    >
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          background: "rgba(0, 0, 0, 0.5)",
+          padding: "20px",
+          borderRadius: "10px",
+        }}
+      >
+        <CircularProgress color="primary" size={80} />
+        <Typography
+          variant="h6"
+          component="div"
+          style={{ marginTop: "20px", color: "#fff" }}
+        >
+          Loading...
+        </Typography>
+      </div>
+    </div>
+  </Modal>
+      <Sidebar  title = "Add Administrator"/>
       <Box paddingTop="2rem">
         <FormContainer>
           <Typography variant="h4" component="h2" align="center">
-            Insert User Details Below
+            Insert Admin User Details Below
           </Typography>
           <StyledTextField
-  name="name"
-  label="Name"
-  value={values.name}
-  onChange={handleChange}
-/>
-<StyledTextField
-  name="email"
-  label="Email"
-  value={values.email}
-  onChange={handleChange}
-/>
-<StyledTextField
-  name="message"
-  label="Message"
-  value={values.message}
-  onChange={handleChange}
-  multiline
-  rows={4}
-/>
-<FormControl>
-  <InputLabel>Select Category</InputLabel>
-  <Select
-    name="category"
-    value={values.category}
-    onChange={handleChange}
-  >
-    <MenuItem value="programming_in_c">Programming in C</MenuItem>
-    <MenuItem value="mathematics_for_computing">Mathematics for Computing</MenuItem>
-    <MenuItem value="java">Java</MenuItem>
-  </Select>
-</FormControl>
-<SubmitButton
-  type="submit"
-  variant="contained"
-  color="primary"
-  onClick={handleSubmit}
->
-  Submit
-</SubmitButton>
+            name="email"
+            label="Enter Email"
+            value={values.email}
+            onChange={handleChange}
+          />
+          <StyledTextField
+            name="password"
+            label="Enter Your Password"
+            value={values.password}
+            onChange={handleChange}
+          />
+          <StyledTextField
+            name="retypepassword"
+            label="Please Retype Password"
+            value={values.message}
+            onChange={handleChange}
+          />
+          <FormControl>
+            <InputLabel>Employment Type</InputLabel>
+            <Select
+              name="employmenttype"
+              value={values.employmenttype}
+              onChange={handleChange}
+            >
+              <MenuItem value="Acedemic">Acedemic</MenuItem>
+              <MenuItem value="Non-Acedemic">Non-Acedemic</MenuItem>
+            </Select>
+          </FormControl>
+          {/* <FormControl>
+            <InputLabel>Select Faculty</InputLabel>
+            <Select
+              name="faculty"
+              value={values.faculty}
+              onChange={handleChange}
+            >
+              <MenuItem value="Computing">Faculty of Computing</MenuItem>
+              <MenuItem value="Engineering">Faculty of Engineering</MenuItem>
+              <MenuItem value="Business">Faculty of Business</MenuItem>
+            </Select>
+          </FormControl> */}
+          <StyledTextField
+            name="name"
+            label="Please Enter Your Name"
+            value={values.name}
+            onChange={handleChange}
+          />
+          <StyledTextField
+            name="designation"
+            label="Enter Your Designation"
+            value={values.message}
+            onChange={handleChange}
+          />
+          <SubmitButton
+            type="submit"
+            variant="contained"
+            color="primary"
+            onClick={handleSubmit}
+          >
+            Submit
+          </SubmitButton>
 <Dialog open={openPrompt} onClose={handleClosePrompt}>
   <DialogTitle>Add Questions</DialogTitle>
   <DialogContent>
