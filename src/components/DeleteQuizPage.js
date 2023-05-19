@@ -232,28 +232,13 @@ export default function UsersList() {
                 Description
               </TableCell>
               <TableCell align="left" style={{ minWidth: "100px" }}>
+                Core Area
+              </TableCell>
+              <TableCell align="left" style={{ minWidth: "100px" }}>
                 Subject
               </TableCell>
               <TableCell align="left" style={{ minWidth: "100px" }}>
-                Level
-              </TableCell>
-              <TableCell align="left" style={{ minWidth: "100px" }}>
-                Level2
-              </TableCell>
-              <TableCell align="left" style={{ minWidth: "100px" }}>
-                Level3
-              </TableCell>
-              <TableCell align="left" style={{ minWidth: "100px" }}>
-                Level2
-              </TableCell>
-              <TableCell align="left" style={{ minWidth: "100px" }}>
-                Level3
-              </TableCell>
-              <TableCell align="left" style={{ minWidth: "100px" }}>
-                Level2
-              </TableCell>
-              <TableCell align="left" style={{ minWidth: "100px" }}>
-                Level3
+                Difficulty Level
               </TableCell>
               <TableCell align="left" style={{ minWidth: "100px" }}>
                 Action
@@ -273,14 +258,9 @@ export default function UsersList() {
                   >
                     <TableCell align="left">{row.title}</TableCell>
                     <TableCell align="left">{row.description}</TableCell>
+                    <TableCell align="left">{row.coreArea}</TableCell>
                     <TableCell align="left">{row.subject}</TableCell>
                     <TableCell align="left">{row.level}</TableCell>
-                    <TableCell align="left">{row.description}</TableCell>
-                    <TableCell align="left">{row.subject}</TableCell>
-                    <TableCell align="left">{row.description}</TableCell>
-                    <TableCell align="left">{row.subject}</TableCell>
-                    <TableCell align="left">{row.description}</TableCell>
-                    <TableCell align="left">{row.subject}</TableCell>
                     <TableCell align="left">
                       <Stack spacing={2} direction="row">
                         {/* <EditIcon
