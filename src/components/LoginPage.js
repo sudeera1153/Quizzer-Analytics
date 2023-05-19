@@ -225,10 +225,7 @@ const LoginPage = () => {
                 id="password"
                 autoComplete="current-password"
               />
-              <FormControlLabel
-                control={<Checkbox value="remember" color="primary" checked={rememberMe} onChange={(e) => setRememberMe(e.target.checked)} />}
-                label="Remember me"
-              />
+              
               <Button
       onClick={handleLogin}
       fullWidth
